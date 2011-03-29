@@ -1,0 +1,15 @@
+.classpath
+.settings
+.project
+*.trc
+*.log
+*.local
+*.settings
+*.xml.releaseBackup
+*~
+*.rej
+*.iml
+*.ipr
+*.iws
+target
+

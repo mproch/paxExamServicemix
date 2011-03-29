@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+       xmlns:ctx="http://www.springframework.org/schema/context"
+       xmlns:cxfbc="http://servicemix.apache.org/cxfbc/1.0"
+       xmlns:pe="http://touk.pl/smx4/paxexam"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://servicemix.apache.org/cxfbc/1.0      http://servicemix.apache.org/schema/servicemix-cxf-bc-2009.01.xsd       
+       http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean class="org.apache.servicemix.common.osgi.EndpointExporter"/>
+
+    <camel:camelContext id="serviceContext" xmlns="http://camel.apache.org/schema/spring">
+        <packageScan>
+            <package>pl.touk.smx4.paxexam</package>
+        </packageScan>
+    </camel:camelContext>
+    <osgi:service id="serviceContextExporter" ref="serviceContext" interface="org.apache.camel.CamelContext"/>
+
+    <cxfbc:consumer service="pe:TestingService"
+                    endpoint="default"
+                    targetService="pe:service1"
+                    locationURI="${locationURI}"
+                    useJBIWrapper="false"
+                    useSOAPEnvelope="false"
+                    wsdl="classpath:/pl/touk/smx4/paxexam/TestService.wsdl"/>
+
+    <osgix:cm-properties id="props" persistent-id="pl.touk.smx4.paxexam"/>
+    <!--placeholder configurer-->
+    <ctx:property-placeholder properties-ref="props"/>
+
+    <bean id="listener" class="pl.touk.smx4.paxexam.Listener"/>
+
+    <osgi:service ref="listener">
+        <osgi:interfaces>
+            <value>org.apache.servicemix.nmr.api.event.ExchangeListener</value>
+            <value>org.apache.servicemix.nmr.api.event.Listener</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+</beans>
